@@ -1,4 +1,4 @@
-name: Go Backup Workflow
+name: Go
 
 on:
   push:
@@ -31,3 +31,6 @@ jobs:
         with:
           name: menumakanan-backup
           path: menumakanan_backup.tar.gz
+
+      - name: Upload to AWS S3
+        run: aws s3 cp backups/menumakanan_latest.tar.gz s3://your-bucket-name/
