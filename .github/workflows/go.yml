@@ -23,20 +23,20 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - name: Ensure Backup Directory
-        run: mkdir -p backups
-
       - name: Create Backup Archive
-        run: tar -czvf backups/menumakanan_backup.tar.gz . --exclude=./backups
+        run: tar --exclude='./backups' -czvf backups/menumakanan_backup.tar.gz .
 
-      - name: Debug Directory Structure
-        run: ls -R
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Configure AWS CLI
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region us-east-1
+      - name: Upload Backup Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: menumakanan-backup
+          path: backups/menumakanan_backup.tar.gz
 
       - name: Upload to AWS S3
         run: aws s3 cp backups/menumakanan_backup.tar.gz s3://your-bucket-name/
